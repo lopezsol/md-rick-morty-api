@@ -15,8 +15,15 @@ export class User {
   @Column({ type: 'varchar', length: 15 })
   name: string;
 
-  @Column({ type: 'varchar', unique: true, length: 50 })
+  // @Column({ type: 'varchar', unique: true, length: 50 })
+  // mail: string;
+  @Column('text', {
+    unique: true,
+  })
   mail: string;
+
+  // @Column({ type: 'varchar', unique: true, length: 50 })
+  // mail: string;
 
   @Column({ type: 'varchar', length: 100, select: false })
   password: string;
@@ -28,7 +35,7 @@ export class User {
   phone?: string;
 
   @Column(() => Address)
-  address: Address;
+  address?: Address;
 
   @Column('text', { default: 'user' })
   role: string;

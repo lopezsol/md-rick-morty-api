@@ -13,6 +13,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { User } from './entities/user.entity';
+import { Auth } from './decorators/auth.decorator';
+import { GetUser } from './decorators/get-user.decorator';
 
 @Controller('user')
 export class AuthController {
@@ -28,11 +30,11 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
-  // @Get('check-status')
-  // @Auth()
-  // checkAuthStatus(@GetUser() user: User) {
-  //   return this.authService.checkAuthStatus(user);
-  // }
+  @Get('check-status')
+  @Auth()
+  checkAuthStatus(@GetUser() user: User) {
+    return this.authService.checkAuthStatus(user);
+  }
 
   @Patch(':id')
   update(

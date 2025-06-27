@@ -1,23 +1,28 @@
-import { IsString, MaxLength, Length } from 'class-validator';
+import { IsString, MaxLength, ValidateIf } from 'class-validator';
 
 export class AddressDto {
+  @ValidateIf((o) => Object.values(o).some((v) => v !== undefined))
   @IsString()
   @MaxLength(50)
   street: string;
 
-  @IsString()
-  @MaxLength(50)
-  city: string;
-
+  @ValidateIf((o) => Object.values(o).some((v) => v !== undefined))
   @IsString()
   @MaxLength(50)
   location: string;
 
+  @ValidateIf((o) => Object.values(o).some((v) => v !== undefined))
+  @IsString()
+  @MaxLength(50)
+  city: string;
+
+  @ValidateIf((o) => Object.values(o).some((v) => v !== undefined))
   @IsString()
   @MaxLength(50)
   country: string;
 
+  @ValidateIf((o) => Object.values(o).some((v) => v !== undefined))
   @IsString()
-  @Length(4, 4)
+  @MaxLength(4)
   cp: string;
 }

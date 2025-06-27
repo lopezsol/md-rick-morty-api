@@ -12,8 +12,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-
 import { LoginUserDto } from './dto/login-user.dto';
+import { successResponse } from 'src/common/helpers/auth-response.helper';
 
 @Injectable()
 export class AuthService {
@@ -23,10 +23,6 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
   ) {}
-
-  // create(createUserDto: CreateUserDto) {
-  //   return 'This action adds a new auth';
-  // }
 
   findAll() {
     return `This action returns all auth`;
@@ -48,6 +44,13 @@ export class AuthService {
     try {
       const { password, ...userData } = createUserDto;
 
+      const existingUser = await this.userRepository.findOneBy({
+        mail: userData.mail,
+      });
+      if (existingUser) {
+        throw new BadRequestException('Mail already registered');
+      }
+
       const user = this.userRepository.create({
         ...userData,
         password: bcrypt.hashSync(password, 10),
@@ -56,11 +59,10 @@ export class AuthService {
       await this.userRepository.save(user);
       const { password: _, ...userWithoutPassword } = user;
 
-      return {
-        ...userWithoutPassword,
-        // token: this.getJwtToken({ id: user.id }),
-      };
-      // TODO: Retornar el JWT de acceso
+      return successResponse({
+        message: 'User created successfully',
+        data: { user: userWithoutPassword },
+      });
     } catch (error) {
       this.handleDBErrors(error);
     }
@@ -69,30 +71,36 @@ export class AuthService {
   async login(loginUserDto: LoginUserDto) {
     const { password, mail } = loginUserDto;
 
-    const user = await this.userRepository.findOne({
-      where: { mail },
-      select: { mail: true, password: true, id: true }, //! OJO!
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.mail = :mail', { mail })
+      .getOne();
 
-    if (!user)
-      throw new UnauthorizedException('Credentials are not valid (email)');
+    if (!user) throw new UnauthorizedException('User not found');
 
     if (!bcrypt.compareSync(password, user.password))
-      throw new UnauthorizedException('Credentials are not valid (password)');
+      throw new UnauthorizedException('Invalid password');
 
     const { password: _, ...userWithoutPassword } = user;
 
-    return {
-      ...userWithoutPassword,
-      token: this.getJwtToken({ id: user.id }),
-    };
+    return successResponse({
+      message: 'authenticated user',
+      data: {
+        user: userWithoutPassword,
+        token: this.getJwtToken({ id: user.id }),
+      },
+    });
   }
 
   checkAuthStatus(user: User) {
-    return {
-      ...user,
-      token: this.getJwtToken({ id: user.id }),
-    };
+    return successResponse({
+      message: 'Auth status ok',
+      data: {
+        user,
+        token: this.getJwtToken({ id: user.id }),
+      },
+    });
   }
 
   private getJwtToken(payload: JwtPayload) {
@@ -101,7 +109,8 @@ export class AuthService {
   }
 
   private handleDBErrors(error: any): never {
-    if (error.code === '23505') throw new BadRequestException(error.detail);
+    if (error.code === '23505')
+      throw new BadRequestException('Mail already registered');
 
     console.log(error);
 

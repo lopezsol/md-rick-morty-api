@@ -1,7 +1,9 @@
+// src/auth/strategies/jwt.strategy.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -19,9 +21,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined in configuration');
     }
+
     super({
       secretOrKey: jwtSecret,
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          return request.headers['auth-token'] as string;
+        },
+      ]),
     });
   }
 
@@ -31,9 +38,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) throw new UnauthorizedException('Token not valid');
-
-    // if (!user.isActive)
-    //   throw new UnauthorizedException('User is inactive, talk with an admin');
 
     return user;
   }
