@@ -32,8 +32,41 @@ export class AuthService {
     return `This action returns a #${id} auth`;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} auth`;
+  async update(updateUserDto: UpdateUserDto) {
+    const { id, mail, role, ...updateFields } = updateUserDto;
+
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    // No permitir modificar el mail
+    if (mail && mail !== user.mail) {
+      throw new BadRequestException('Mail is not allowed');
+    }
+
+    // Normalizar el address si vino vacío o null
+
+    if (!updateFields.address || updateFields.address?.street === undefined) {
+      updateFields.address = {
+        street: '',
+        location: '',
+        city: '',
+        country: '',
+        cp: '',
+      };
+    }
+
+    this.userRepository.merge(user, updateFields);
+    await this.userRepository.save(user);
+
+    const { password: _, date, ...userWithoutPassword } = user;
+
+    return successResponse({
+      message: 'User updated successfully',
+      data: { user: userWithoutPassword },
+    });
   }
 
   remove(id: string) {
@@ -41,31 +74,27 @@ export class AuthService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const { password, ...userData } = createUserDto;
+    const { password, ...userData } = createUserDto;
 
-      const existingUser = await this.userRepository.findOneBy({
-        mail: userData.mail,
-      });
-      if (existingUser) {
-        throw new BadRequestException('Mail already registered');
-      }
-
-      const user = this.userRepository.create({
-        ...userData,
-        password: bcrypt.hashSync(password, 10),
-      });
-
-      await this.userRepository.save(user);
-      const { password: _, ...userWithoutPassword } = user;
-
-      return successResponse({
-        message: 'User created successfully',
-        data: { user: userWithoutPassword },
-      });
-    } catch (error) {
-      this.handleDBErrors(error);
+    const existingUser = await this.userRepository.findOneBy({
+      mail: userData.mail,
+    });
+    if (existingUser) {
+      throw new BadRequestException('Mail already registered');
     }
+
+    const user = this.userRepository.create({
+      ...userData,
+      password: bcrypt.hashSync(password, 10),
+    });
+
+    await this.userRepository.save(user);
+    const { password: _, ...userWithoutPassword } = user;
+
+    return successResponse({
+      message: 'User created successfully',
+      data: { user: userWithoutPassword },
+    });
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -82,7 +111,7 @@ export class AuthService {
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException('Invalid password');
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, date, ...userWithoutPassword } = user;
 
     return successResponse({
       message: 'authenticated user',
