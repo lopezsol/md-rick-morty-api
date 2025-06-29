@@ -5,7 +5,7 @@ export function successResponse({
   message,
   data = {},
 }: {
-  message: string;
+  message?: string;
   data?: any;
 }) {
   return {

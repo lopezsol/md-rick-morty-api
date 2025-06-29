@@ -13,7 +13,7 @@ export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'text', length: 500 })
+  @Column({ type: 'text' })
   content: string;
 
   @ManyToOne(() => User, { eager: false })

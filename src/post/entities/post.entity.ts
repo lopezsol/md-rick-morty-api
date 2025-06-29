@@ -7,7 +7,7 @@ export class Post {
   id: string;
 
   @Column('int')
-  idEpisode: number;
+  episodeId: number;
 
   @Column({ default: true })
   enabled: boolean;

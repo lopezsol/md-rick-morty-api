@@ -29,17 +29,17 @@ export class CommentController {
 
   // @Get(':id')
   // @Auth()
-  // findAllByIdPost(@Param('id', ParseUUIDPipe) id: string) {
-  //   return this.commentService.findAllByIdPost(id);
+  // findAllBypostId(@Param('id', ParseUUIDPipe) id: string) {
+  //   return this.commentService.findAllBypostId(id);
   // }
 
   @Get(':id')
-  findAllByIdPost(
+  findAllBypostId(
     @Param('id', ParseUUIDPipe) postId: string,
     @Query('limit') limit = '20',
     @Query('page') page = '1',
   ) {
-    return this.commentService.findAllByIdPost(postId, {
+    return this.commentService.findAllBypostId(postId, {
       limit: Number(limit),
       page: Number(page),
       route: '', // si querés que venga con `nextPageUrl`, poné la base acá

@@ -47,13 +47,24 @@ export class CommentService {
 
     await this.commentRepository.save(comment);
 
+    const newComment = {
+      id: comment.id,
+      content: comment.content,
+      author: {
+        id: user.id,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+      },
+      createdAt: comment.createdAt,
+    };
+
     return successResponse({
       message: 'Comment created successfully',
-      data: { newComment: comment },
+      data: { newComment },
     });
   }
 
-  // async findAllByIdPost(postId: string) {
+  // async findAllBypostId(postId: string) {
   //   const post = await this.postRepository.findOneBy({ id: postId });
   //   if (!post) {
   //     throw new NotFoundException('Post not found');
@@ -71,7 +82,7 @@ export class CommentService {
   //   });
   // }
 
-  async findAllByIdPost(postId: string, options: IPaginationOptions) {
+  async findAllBypostId(postId: string, options: IPaginationOptions) {
     const post = await this.postRepository.findOneBy({ id: postId });
     if (!post) throw new NotFoundException('Post not found');
 
@@ -86,7 +97,7 @@ export class CommentService {
     const comments = paginated.items.map((comment) => ({
       id: comment.id,
       content: comment.content,
-      idPost: postId,
+      postId: postId,
       createdAt: comment.createdAt,
       author: {
         name: comment.user.name,
