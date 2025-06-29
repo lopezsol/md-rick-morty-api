@@ -37,7 +37,7 @@ export class AuthController {
     return this.authService.checkAuthStatus(user);
   }
 
-  @Put('/update')
+  @Put('update')
   @Auth()
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.authService.update(updateUserDto);

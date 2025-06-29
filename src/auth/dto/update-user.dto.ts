@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
 import {
   IsArray,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -22,6 +23,6 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  favoriteEpisodes?: string[];
+  @IsNumber({}, { each: true })
+  favoriteEpisodes?: number[];
 }

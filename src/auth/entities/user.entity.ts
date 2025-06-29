@@ -2,6 +2,7 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
+  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -40,11 +41,12 @@ export class User {
   @Column('text', { default: 'user' })
   role: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   date: Date;
 
   @Column('text', { array: true, nullable: true })
-  favoriteEpisodes?: string[];
+  favoriteEpisodes?: number[];
 
   @Column({ type: 'varchar', length: 2048, nullable: true })
   avatarUrl?: string;
