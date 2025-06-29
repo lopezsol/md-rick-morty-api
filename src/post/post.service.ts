@@ -51,7 +51,9 @@ export class PostService {
 
     await this.postRepository.save(post);
 
-    return successResponse({ message: 'Post updated successfully' });
+    return successResponse({
+      message: 'Post updated successfully',
+    });
   }
 
   async findOne(id: string) {
