@@ -16,6 +16,9 @@ export class User {
   @Column({ type: 'varchar', length: 15 })
   name: string;
 
+  @Column({ type: 'varchar', length: 15, nullable: true })
+  nickname?: string;
+
   // @Column({ type: 'varchar', unique: true, length: 50 })
   // mail: string;
   @Column('text', {
@@ -45,7 +48,7 @@ export class User {
   @CreateDateColumn()
   date: Date;
 
-  @Column('text', { array: true, nullable: true })
+  @Column('int', { array: true, nullable: true })
   favoriteEpisodes?: number[];
 
   @Column({ type: 'varchar', length: 2048, nullable: true })

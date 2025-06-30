@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    const { id, mail, role, ...updateFields } = updateUserDto;
+    const { id, mail, ...updateFields } = updateUserDto;
 
     const user = await this.userRepository.findOneBy({ id });
 
