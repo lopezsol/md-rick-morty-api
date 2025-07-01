@@ -58,6 +58,18 @@ export class AuthService {
       };
     }
 
+    if (!updateFields.nickname) {
+      updateFields.nickname = '';
+    }
+
+    if (!updateFields.birthday) {
+      updateFields.birthday = '';
+    }
+
+    if (!updateFields.avatarUrl) {
+      updateFields.avatarUrl = '';
+    }
+
     this.userRepository.merge(user, updateFields);
     await this.userRepository.save(user);
 
