@@ -56,6 +56,11 @@ export class AuthService {
       };
     }
 
+    if (!updateFields.birthday || updateFields.birthday === '') {
+      console.log('estoy entrando');
+      updateFields.birthday = undefined;
+    }
+
     // this.userRepository.merge(user, updateFields);
     Object.assign(user, updateFields);
     await this.userRepository.save(user);
