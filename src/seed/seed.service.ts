@@ -18,7 +18,7 @@ export class SeedService {
   ) {}
 
   async seed() {
-    // Limpiar tablas en orden correcto por FK
+    // Limpiar tablas en orden correcto por FK si querés (descomentar)
     // await this.commentRepository.clear();
     // await this.postRepository.clear();
     // await this.userRepository.clear();
@@ -75,7 +75,7 @@ export class SeedService {
       users.push(await this.userRepository.save(user));
     }
 
-    // Crear posts
+    // Crear posts para episodios 1 a 5
     const posts: PostEntity[] = [];
     for (let i = 1; i <= 5; i++) {
       const post = this.postRepository.create({
@@ -85,57 +85,55 @@ export class SeedService {
       posts.push(await this.postRepository.save(post));
     }
 
-    // Comentarios distintos por post
-    const commentsTextsPerPost = [
-      [
-        'Wubba lubba dub dub!',
-        'I turned myself into a pickle!',
-        'That was a wild episode!',
-      ],
-      [
-        'Morty, you gotta relax.',
-        'Classic Rick and Morty chaos.',
-        'Rick is a genius... and a mess.',
-      ],
-      [
-        'Time to go on an adventure!',
-        'This episode blew my mind.',
-        'Summer is the real MVP.',
-      ],
-      [
-        'What a crazy portal jump!',
-        'Love the animation in this one.',
-        'Beth is awesome here.',
-      ],
-      [
-        'Morty got owned again!',
-        'Interdimensional cable is the best.',
-        'Pickle Rick strikes again!',
-      ],
+    // Sólo comentarios para episodio 1
+    const episode1Post = posts.find((p) => p.episodeId === 1);
+    if (!episode1Post) throw new Error('Post for episode 1 not found');
+
+    const commentsTextsForEpisode1 = [
+      'Wubba lubba dub dub!',
+      'I turned myself into a pickle!',
+      'That was a wild episode!',
+      'Morty, you gotta relax.',
+      'Classic Rick and Morty chaos.',
+      'Rick is a genius... and a mess.',
+      'Time to go on an adventure!',
+      'This episode blew my mind.',
+      'Summer is the real MVP.',
+      'What a crazy portal jump!',
+      'Love the animation in this one.',
+      'Beth is awesome here.',
+      'Morty got owned again!',
+      'Interdimensional cable is the best.',
+      'Pickle Rick strikes again!',
     ];
 
-    // Crear comentarios: 2 por post por usuario
-    for (const user of users) {
-      for (let postIndex = 0; postIndex < posts.length; postIndex++) {
-        const post = posts[postIndex];
-        const commentsTexts = commentsTextsPerPost[postIndex];
-        for (let i = 0; i < 2; i++) {
-          const comment = this.commentRepository.create({
-            content:
-              commentsTexts[Math.floor(Math.random() * commentsTexts.length)],
-            post,
-            user,
-          });
-          await this.commentRepository.save(comment);
-        }
-      }
-    }
+    // Clonar la lista para ir sacando usados
+    const availableComments = [...commentsTextsForEpisode1];
 
+    // Cada usuario pone 1 solo comentario distinto en episodio 1
+    for (const user of users) {
+      if (user.role === 'admin') continue; // <-- saltamos admins
+
+      if (availableComments.length === 0) break;
+
+      const randomIndex = Math.floor(Math.random() * availableComments.length);
+      const commentText = availableComments.splice(randomIndex, 1)[0];
+
+      const comment = this.commentRepository.create({
+        content: commentText,
+        post: episode1Post,
+        user,
+      });
+      await this.commentRepository.save(comment);
+    }
     return {
       message: 'Database seeded successfully',
       usersCount: users.length,
       postsCount: posts.length,
-      commentsCount: users.length * posts.length * 2,
+      commentsCount:
+        users.length > commentsTextsForEpisode1.length
+          ? commentsTextsForEpisode1.length
+          : users.length,
     };
   }
 }

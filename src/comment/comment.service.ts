@@ -114,9 +114,10 @@ export class CommentService {
           commentsPerPage: paginated.meta.itemsPerPage,
           totalPages: paginated.meta.totalPages,
           page: paginated.meta.currentPage,
-          nextPage: paginated.meta.hasNextPage
-            ? paginated.meta.currentPage + 1
-            : null,
+          nextPage:
+            paginated.meta.currentPage < (paginated.meta.totalPages ?? 0)
+              ? paginated.meta.currentPage + 1
+              : null,
         },
         comments,
       },
