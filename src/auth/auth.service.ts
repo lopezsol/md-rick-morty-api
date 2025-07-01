@@ -46,8 +46,6 @@ export class AuthService {
       throw new BadRequestException('Mail is not allowed');
     }
 
-    // Normalizar el address si vino vacío o null
-
     if (!updateFields.address || updateFields.address?.street === undefined) {
       updateFields.address = {
         street: '',
@@ -58,19 +56,8 @@ export class AuthService {
       };
     }
 
-    if (!updateFields.nickname) {
-      updateFields.nickname = '';
-    }
-
-    if (!updateFields.birthday) {
-      updateFields.birthday = '';
-    }
-
-    if (!updateFields.avatarUrl) {
-      updateFields.avatarUrl = '';
-    }
-
-    this.userRepository.merge(user, updateFields);
+    // this.userRepository.merge(user, updateFields);
+    Object.assign(user, updateFields);
     await this.userRepository.save(user);
 
     const { password: _, date, ...userWithoutPassword } = user;
