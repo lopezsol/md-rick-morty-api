@@ -26,7 +26,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: jwtSecret,
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          return request.headers['auth-token'] as string;
+          const token = request.headers['auth-token'];
+          return typeof token === 'string' ? token : null;
         },
       ]),
     });
