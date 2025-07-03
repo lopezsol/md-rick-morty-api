@@ -34,10 +34,10 @@ export class AuthController {
     return this.authService.update(updateUserDto);
   }
 
-  // @Patch('update/favorite-episodes')
-  // updateFavorites(@Body() dto: UpdateUserFavoriteEpisodesDto) {
-  //   return this.authService.updateFavoriteEpisodes(dto);
-  // }
+  @Patch('update/favorite-episodes')
+  updateFavorites(@Body() dto: UpdateUserFavoriteEpisodesDto) {
+    return this.authService.updateFavoriteEpisodes(dto);
+  }
 
   // @Get()
   // findAll() {

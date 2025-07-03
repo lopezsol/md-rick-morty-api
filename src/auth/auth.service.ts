@@ -14,6 +14,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { successResponse } from 'src/common/helpers/auth-response.helper';
+import { UpdateUserFavoriteEpisodesDto } from './dto/update-user-favorite-episodes.dto';
 
 @Injectable()
 export class AuthService {
@@ -71,6 +72,26 @@ export class AuthService {
     await this.userRepository.save(sanitizedUser);
 
     const { password: _, date, ...userWithoutPassword } = sanitizedUser;
+
+    return successResponse({
+      message: 'User updated successfully',
+      data: { user: userWithoutPassword },
+    });
+  }
+
+  async updateFavoriteEpisodes(updateUserDto: UpdateUserFavoriteEpisodesDto) {
+    const { id } = updateUserDto;
+    console.log(updateUserDto);
+
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    user.favoriteEpisodes = updateUserDto.favoriteEpisodes;
+    await this.userRepository.save(user);
+
+    const { password: _, date, ...userWithoutPassword } = user;
 
     return successResponse({
       message: 'User updated successfully',
