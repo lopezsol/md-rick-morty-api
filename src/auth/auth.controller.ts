@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ParseUUIDPipe,
-  Put,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,6 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { User } from './entities/user.entity';
 import { Auth } from './decorators/auth.decorator';
 import { GetUser } from './decorators/get-user.decorator';
+import { UpdateUserFavoriteEpisodesDto } from './dto/update-user-favorite-episodes.dto';
 
 @Controller('user')
 export class AuthController {
@@ -42,6 +33,11 @@ export class AuthController {
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.authService.update(updateUserDto);
   }
+
+  // @Patch('update/favorite-episodes')
+  // updateFavorites(@Body() dto: UpdateUserFavoriteEpisodesDto) {
+  //   return this.authService.updateFavoriteEpisodes(dto);
+  // }
 
   // @Get()
   // findAll() {

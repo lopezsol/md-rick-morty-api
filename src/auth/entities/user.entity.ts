@@ -17,7 +17,7 @@ export class User {
   name: string;
 
   @Column({ type: 'varchar', length: 15, nullable: true })
-  nickname?: string;
+  nickname?: string | null;
 
   // @Column({ type: 'varchar', unique: true, length: 50 })
   // mail: string;
@@ -33,7 +33,7 @@ export class User {
   password: string;
 
   @Column({ type: 'timestamptz', nullable: true })
-  birthday?: Date;
+  birthday?: Date | null;
 
   @Column({ type: 'varchar', length: 15, nullable: true })
   phone?: string;
@@ -52,7 +52,7 @@ export class User {
   favoriteEpisodes?: number[];
 
   @Column({ type: 'varchar', length: 2048, nullable: true })
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 
   @BeforeInsert()
   normalize() {

@@ -33,7 +33,8 @@ export class AuthService {
   }
 
   async update(updateUserDto: UpdateUserDto) {
-    const { id, mail, ...updateFields } = updateUserDto;
+    const { id, ...updateFields } = updateUserDto;
+    console.log(updateUserDto);
 
     const user = await this.userRepository.findOneBy({ id });
 
@@ -42,9 +43,9 @@ export class AuthService {
     }
 
     // No permitir modificar el mail
-    if (mail && mail !== user.mail) {
-      throw new BadRequestException('Mail is not allowed');
-    }
+    // if (mail && mail !== user.mail) {
+    //   throw new BadRequestException('Mail is not allowed');
+    // }
 
     if (!updateFields.address || updateFields.address?.street === undefined) {
       updateFields.address = {
@@ -56,16 +57,20 @@ export class AuthService {
       };
     }
 
-    if (!updateFields.birthday || updateFields.birthday === '') {
-      console.log('estoy entrando');
-      updateFields.birthday = undefined;
-    }
+    const sanitizedUser = {
+      ...user,
+      nickname:
+        updateFields.nickname === undefined ? null : updateFields.nickname,
+      birthday:
+        updateFields.birthday === undefined ? null : updateFields.birthday,
+      avatarUrl:
+        updateFields.avatarUrl === undefined ? null : updateFields.avatarUrl,
+      address: updateFields.address,
+    };
 
-    // this.userRepository.merge(user, updateFields);
-    Object.assign(user, updateFields);
-    await this.userRepository.save(user);
+    await this.userRepository.save(sanitizedUser);
 
-    const { password: _, date, ...userWithoutPassword } = user;
+    const { password: _, date, ...userWithoutPassword } = sanitizedUser;
 
     return successResponse({
       message: 'User updated successfully',

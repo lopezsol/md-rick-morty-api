@@ -1,34 +1,54 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './create-user.dto';
 import {
   IsArray,
+  IsDateString,
   IsInt,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
   MaxLength,
   MinLength,
   ValidateIf,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+import { AddressDto } from './create-address.dto';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
+export class UpdateUserDto {
   @IsUUID()
   id: string;
 
   @IsOptional()
+  @ValidateIf((obj) => obj.name !== null)
   @IsString()
-  @MaxLength(2048)
-  avatarUrl?: string;
+  @MinLength(5)
+  @MaxLength(15)
+  name?: string | null;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => AddressDto)
+  address?: AddressDto | null;
+
+  @IsOptional()
+  @ValidateIf((obj) => obj.birthday !== null)
+  @IsDateString()
+  birthday?: string | null;
+
+  @IsOptional()
+  @ValidateIf((obj) => obj.nickname !== null)
+  @IsString()
+  @MinLength(3)
+  @MaxLength(15)
+  nickname?: string | null;
 
   @IsOptional()
   @IsArray()
   @IsInt({ each: true })
-  favoriteEpisodes?: number[];
+  favoriteEpisodes?: number[] | null;
 
   @IsOptional()
+  @ValidateIf((obj) => obj.avatarUrl !== null)
   @IsString()
-  @MinLength(3)
-  @MaxLength(15)
-  nickname?: string;
+  @MaxLength(2048)
+  avatarUrl?: string | null;
 }
